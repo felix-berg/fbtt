@@ -18,18 +18,20 @@ int fact(int n)
    else
       return n * fact(n - 1);
 }
-#include "terminalColor.hpp"
+
+using namespace fbtt;
 
 int main() {
    
    Test factorialTest { "Factorial", []() { 
       assert_throws_message<FactError>("Cannot compute factorial of negative number.", fact, -1);
-      assert_throws_message<FactError>("Integer overflow.", fact, 13);
+      assert_throws_message<FactError>("Integer overflo", fact, 13);
       
       assert_equals(fact(5), 120);
       assert_equals(fact(10), 3628800);
       assert_equals(fact(1), -1);
    }};
+
    std::cout << factorialTest << '\n';
 
    factorialTest.run();

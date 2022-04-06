@@ -28,7 +28,7 @@ private:
    int elements[64];
 };
 
-
+using namespace fbtt;
 
 int main() {
    ClassTest<Stack> stackTest;
@@ -84,6 +84,12 @@ int main() {
       assert_equals(88, stack.pop());
       assert_equals(99, stack.pop());
    });
+
+   stackTest.add_test("Failing test", [](Stack & stack) { 
+      assert_throws_m<Stack::Underflow>(stack, &Stack::push, 2);
+   });
+
+
 
    stackTest.run();
    std::cout << stackTest << '\n';

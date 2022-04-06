@@ -36,12 +36,15 @@ concept function_with_signature =
 template <typename ErrorType>
 concept is_error = std::derived_from<ErrorType, std::exception>;
 
-template <typename Function, typename ... Args>
-   requires arguments_to<Function, Args...>
-               &&
-            Callable<Function, Args...>
-void invoke(Function f, Args ... args)
-{
-   f(args...);
-}
+
+namespace fbtt {
+   template <typename Function, typename ... Args>
+      requires arguments_to<Function, Args...>
+                  &&
+               Callable<Function, Args...>
+   void invoke(Function f, Args ... args)
+   {
+      f(args...);
+   }
+};
 

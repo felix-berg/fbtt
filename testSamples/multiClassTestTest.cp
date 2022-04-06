@@ -42,10 +42,6 @@ int main()
       { a.throwingMethod(); });
    });
 
-   test.add_test("Failing test", [](A & a, B & b) {
-      assert_throws<std::exception>([&]() { b.touch(a); });
-   });
-
    test.run();
 
    std::cout << test;
