@@ -1,0 +1,61 @@
+#pragma once
+
+#include <vector>
+#include <functional>
+
+#include "test.hpp"
+
+template <typename Class>
+   requires (!std::same_as<Class, void>)
+class ClassTest {
+public:
+   ClassTest() { };
+
+   template <typename Function>
+      requires storable_function<Function, void, Class &>
+   void add_test(const std::string & name, Function func)
+   {
+      m_tests.push_back(Test<Class &> {
+         name, func
+      });
+   }
+
+   std::function<void(Class *)> construct = [](Class * instancePointer) -> void {
+      instancePointer = new Class { };
+   };
+
+   void run()
+   {
+      for (size_t i = 0; i < m_tests.size(); i++)
+      {
+         this->construct(classInstance);
+
+         m_tests[i].run(*classInstance);
+         
+         delete classInstance;
+      }
+   }
+
+private:
+
+   template <typename S>
+   friend std::ostream & operator << (std::ostream &, const ClassTest<S> &);
+
+   Class * classInstance;
+   std::vector<Test<Class &>> m_tests;
+};
+
+template <typename ClassName>
+std::ostream & operator << (std::ostream & os, const ClassTest<ClassName> & classTest)
+{
+   os << TerminalStyle::BOLD
+      << "Summary of class test: "
+      << TerminalColor::BRIGHT_YELLOW 
+      << typeid(ClassName).name() 
+      << TerminalColor::RESET << TerminalStyle::NONE
+      << '\n';
+   for (size_t i = 0; i < classTest.m_tests.size(); i++) {
+      os << "   " << classTest.m_tests[i] << '\n';
+   }
+   return os;
+}
