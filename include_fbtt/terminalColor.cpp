@@ -7,6 +7,7 @@ fbtt::TerminalColor g_terminalColor = fbtt::TerminalColor::WHITE;
 
 void update_ostream_color_and_style(std::ostream & os)
 {
+   // unix escape code \033
    os << "\033[" << static_cast<int>(g_terminalStyle) 
       << ';'     << static_cast<int>(g_terminalColor) 
       << 'm';

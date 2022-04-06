@@ -3,6 +3,8 @@
 #include <iostream>
 
 namespace fbtt {
+   /** Enumeration for terminal color. Can be used on an ostream to output text in different colors on
+    * unix-based systems. */
    enum TerminalColor {
       BLACK = 30,
       RED, GREEN, YELLOW, BLUE, 
@@ -14,10 +16,13 @@ namespace fbtt {
       RESET = 0
    };
 
+   /** Enumeration for terminal color. Can be used on an ostream to output text in different styles on
+    * unix-based systems. */
    enum TerminalStyle {
       NONE = 0, BOLD, ITALICS
    };
    
+   // changing of terminal color & style on given ostream
    std::ostream & operator << (std::ostream & os, TerminalColor color);
    std::ostream & operator << (std::ostream & os, TerminalStyle style);
 };
