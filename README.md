@@ -29,3 +29,4 @@ This will, if the function passed, produce the following output:
 
 
 If the function had failed, if `factorial(5)` had been evaluated, to `121`, the test result would have been:
+![image](https://user-images.githubusercontent.com/93908883/161979104-1f129abd-7a83-4988-8b23-af4fe59c22cb.png)
