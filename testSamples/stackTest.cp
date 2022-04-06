@@ -50,8 +50,7 @@ int main() {
    });
 
    stackTest.add_test("Popping empty stack throws underflow", [](Stack & stack) {
-      assert_throws<Stack::Underflow>(
-         [&]() { stack.pop(); });
+      assert_throws_m<Stack::Underflow>(stack, &Stack::pop);
    });
 
    stackTest.add_test("After one push one pop, stack is empty", [](Stack & stack) {
