@@ -25,3 +25,4 @@ std::string result = factorialTest.report();
 std::cout << factorialTest;
 ```
 This will, if the function passed, produce the following output:
+![image](https://user-images.githubusercontent.com/93908883/161978697-196a918c-93a7-4f45-927b-db27275fa879.png)
