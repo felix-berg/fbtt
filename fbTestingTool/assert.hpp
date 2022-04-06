@@ -122,8 +122,8 @@ namespace fbtt {
 
          throw AssertionError(
             (std::string) "Function threw unexpected error: " + std::string(e.what()));
-         // we made it out -> no error thrown. Assertion failed.
       }
+      // we made it out -> no error thrown. Assertion failed.Q
    }
 
    template <typename ErrorType, typename Function, typename ... Args>
