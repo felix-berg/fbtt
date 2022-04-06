@@ -1,0 +1,6 @@
+#include "fb"
+
+int main() 
+{
+
+}
