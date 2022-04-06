@@ -26,7 +26,7 @@ int main() {
       assert_throws<FactError>(fact, -1);
       assert_throws_message("Integer overflow.", fact, 13);
       
-      assert_equals(fact(5), 120);
+      assert_equals(121, 120);
       assert_equals(fact(10), 3628800);
       // assert_equals(fact(1), -1);
    }};

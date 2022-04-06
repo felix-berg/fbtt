@@ -27,9 +27,9 @@ namespace fbtt {
        * @param func: Any storable function (e.g. function, lambda, std::function, non-static member function...) */
       template <typename Function>
          requires storable_function<Function, void, Args...>
-      Test(const std::string & testName, Function func)
+      Test(const std::string & testName, Function && func)
          : m_testName { testName }, 
-         m_userFunc { std::function<void(Args...)> ( func ) }
+         m_userFunc { (std::function<void(Args...)>) ( func ) }
       {
 
       };
@@ -46,7 +46,7 @@ namespace fbtt {
             // function didn't throw -> pass
             m_result = TestResult::PASSED;
          
-         } catch (AssertionError & e) {
+         } catch (AssertionFailure & e) {
             m_result = TestResult::ASSERTION_FAILURE;
 
             std::string what = e.what();
