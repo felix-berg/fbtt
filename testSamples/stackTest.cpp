@@ -1,4 +1,5 @@
-#include "classTest.hpp"
+/** Test of Stack class - courtesy of Uncle Bob (https://www.youtube.com/watch?v=58jGpV2Cg50&list=PLmmYSbUCWJ4x1GO839azG_BBw8rkh-zOj&index=4) */
+#include "fbTestingTool.hpp"
 
 #include <iostream>
 
@@ -33,12 +34,6 @@ using namespace fbtt;
 int main() {
    ClassTest<Stack> stackTest;
 
-   stackTest.add_test("Nothing", 
-      [](Stack & stack) {
-
-      }
-   );
-
    stackTest.add_test("New stack is empty", [](Stack & stack) {
       assert_true(stack.isEmpty(), "Stack is not empty");
    });
@@ -50,7 +45,7 @@ int main() {
    });
 
    stackTest.add_test("Popping empty stack throws underflow", [](Stack & stack) {
-      assert_throws_m<Stack::Underflow>(stack, &Stack::pop);
+      assert_method_throws<Stack::Underflow>(stack, &Stack::pop);
    });
 
    stackTest.add_test("After one push one pop, stack is empty", [](Stack & stack) {
@@ -83,12 +78,6 @@ int main() {
       assert_equals(88, stack.pop());
       assert_equals(99, stack.pop());
    });
-
-   stackTest.add_test("Failing test", [](Stack & stack) { 
-      assert_throws_m<Stack::Underflow>(stack, &Stack::push, 2);
-   });
-
-
 
    stackTest.run();
    std::cout << stackTest << '\n';

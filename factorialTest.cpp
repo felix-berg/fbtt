@@ -1,8 +1,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "assert.hpp"
-#include "test.hpp"
+#include "fbTestingTool.hpp"
 
 typedef std::runtime_error FactError;
 
@@ -23,13 +22,13 @@ using namespace fbtt;
 
 int main() {
    
-   Test factorialTest { "Factorial", []() { 
-      assert_throws_message<FactError>("Cannot compute factorial of negative number.", fact, -1);
-      assert_throws_message<FactError>("Integer overflo", fact, 13);
+   Test factorialTest { "Factorial of 5 is equal to 120", []() { 
+      assert_throws<FactError>(fact, -1);
+      assert_throws_message("Integer overflow.", fact, 13);
       
       assert_equals(fact(5), 120);
       assert_equals(fact(10), 3628800);
-      assert_equals(fact(1), -1);
+      // assert_equals(fact(1), -1);
    }};
 
    std::cout << factorialTest << '\n';

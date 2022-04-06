@@ -37,6 +37,7 @@ template <typename ErrorType>
 concept is_error = std::derived_from<ErrorType, std::exception>;
 
 
+// Namespace for Felix Berg Testing Tool
 namespace fbtt {
    template <typename Function, typename ... Args>
       requires arguments_to<Function, Args...>

@@ -5,7 +5,6 @@
 #include "terminalColor.hpp"
 
 namespace fbtt {
-
    enum TestResult {
       NORUN, // test hasn't been executed yet
       PASSED, 
@@ -13,12 +12,19 @@ namespace fbtt {
       UNWANTED_ERROR
    };
 
+   /** Test class */
    template<typename ... Args>
    class Test {
    public:
       // for errors in this error detection
-      typedef std::runtime_error Error;
+      struct Error : public std::runtime_error {
+         Error() : std::runtime_error { "No error message" } { };
+         Error(const std::string & s) : std::runtime_error { s } { };
+      };
 
+      /** Construct a new test around a new name and any storable function.
+       * @param name: Name for constructed test.
+       * @param func: Any storable function (e.g. function, lambda, std::function, non-static member function...) */
       template <typename Function>
          requires storable_function<Function, void, Args...>
       Test(const std::string & testName, Function func)
@@ -28,9 +34,11 @@ namespace fbtt {
 
       };
 
+      /** Run test 
+       * @param args... Arguments to run test with. Will most likely be (). */
       void run(Args ... args) {
          if (m_userFunc == nullptr)
-            throw Test::Error("Test function undefined.");
+            throw Test::Error("Test function for test \"" + m_testName + "\" undefined.");
          
          try {
             m_userFunc(args...);
@@ -51,7 +59,8 @@ namespace fbtt {
          }
       }
 
-      std::string getReport() {
+      /** @returns String for report of the test. */
+      std::string report() {
          std::string result = "Test \"" + m_testName + "\" ";
          switch(m_result) {
             case TestResult::NORUN:
@@ -74,7 +83,7 @@ namespace fbtt {
    private:
       template <typename ... Classes>
       friend std::ostream & operator << (std::ostream &, const Test<Classes...> &);
-
+      
       std::function<void(Args...)> m_userFunc = nullptr;
 
       std::string m_testName;
