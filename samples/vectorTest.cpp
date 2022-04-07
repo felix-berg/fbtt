@@ -1,13 +1,6 @@
 #include "fbTestingTool.hpp"
 
-
 using namespace fbtt;
-
-struct A { 
-public:
-   int a;
-   A(int b) : a { b } { };
-};
 
 int main()
 {
