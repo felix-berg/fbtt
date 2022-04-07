@@ -8,12 +8,7 @@
 #include <string>
 
 namespace fbtt {
-   template <OptionalError ExpectedError = NoError, typename ... TestArgs>
-   class Test {
-      const std::function<void(TestArgs...)> m_function;
-      const std::string m_name;
-      std::string m_failureString = "";
-
+   struct TestResult {
       enum Status {
          NOT_RUN,
          PASSED, 
@@ -23,7 +18,35 @@ namespace fbtt {
          UNKNOWN_FAILURE
       };
 
-      Status m_statusCode;
+      const std::string testName;
+      const Status statusCode;
+      const std::string failString = "";
+
+      bool test_failed() const;
+      std::string status() const;
+      std::string report() const;
+   };
+
+   // abstract base class for any test with any error type
+   // used, so multiclasstest can have multiple different
+   // types of tests in a single vector of <AnyTest *>
+   template <typename ... TestArgs>
+   class AnyTest { 
+   public:
+      AnyTest() { };
+      virtual void run(TestArgs...) = 0;
+      virtual const std::string & name() const = 0;
+      virtual TestResult result() const = 0;
+   };
+
+   template <OptionalError ExpectedError = NoError, typename ... TestArgs>
+   class Test : public AnyTest<TestArgs...> {
+      const std::function<void(TestArgs...)> m_function;
+      const std::string m_name;
+
+
+      std::string m_failureString = "";
+      TestResult::Status m_statusCode = TestResult::Status::NOT_RUN;
 
    public:
       /** Construct a new test around a new name and any storable function.
@@ -31,7 +54,7 @@ namespace fbtt {
        * @param func: Any storable function (e.g. function, lambda, std::function, non-static member function...) */
       template <typename Func>
          requires StorableFunction<Func, void, TestArgs...>
-      Test(const std::string & testName, Func function) 
+      Test(const std::string & testName, Func && function) 
          : m_function { static_cast<std::function<void(TestArgs...)>> ( function ) },
            m_name { testName } { };
 
@@ -46,28 +69,28 @@ namespace fbtt {
             // --- function didn't throw error ---
             // if ExpectedError is void, test passed
             if (std::same_as<ExpectedError, NoError>) {
-               m_statusCode = PASSED;
+               m_statusCode = TestResult::Status::PASSED;
             } else {
                // if ExpectedError is not void -> we didn't recieve the error, we were expecting
-               m_statusCode = DIDNT_THROW_EXPECTED;
+               m_statusCode = TestResult::Status::DIDNT_THROW_EXPECTED;
                m_failureString = "didn't throw error of type: " + std::string(typeid(ExpectedError).name());
             }
          
          } catch (AssertionFailure & e) {
             // test threw assertion failure 
-            m_statusCode = ASSERTION_FAILURE;
+            m_statusCode = TestResult::Status::ASSERTION_FAILURE;
             m_failureString = std::string(e.what());
          } catch (ExpectedError & expected) {
             // function threw expected error -> pass!
-            m_statusCode = PASSED;
+            m_statusCode = TestResult::Status::PASSED;
          } catch (std::exception & e) {
             // function threw unexpected error -> fail
-            m_statusCode = UNEXPECTED_ERROR;
+            m_statusCode = TestResult::Status::UNEXPECTED_ERROR;
             m_failureString = "threw unexpected error of type: " + std::string(typeid(decltype(e)).name());
 
          } catch (...) {
             // caught error, that is not derived from std::exception -> unkown failure
-            m_statusCode = UNKNOWN_FAILURE;
+            m_statusCode = TestResult::Status::UNKNOWN_FAILURE;
             m_failureString = "caught error, that is not derived from std::exception";
          }
       
@@ -76,56 +99,17 @@ namespace fbtt {
       /** @returns Name of test */
       const std::string & name() const { return m_name; };
 
-      /** @returns true, if test failed, false otherwise.*/
-      bool failed() const { 
-         return !(m_statusCode == PASSED || m_statusCode == NOT_RUN);
-      };
-
-      /** @returns Status of test. */
-      std::string status() const {
-         switch (m_statusCode) {
-            case PASSED:
-               return "passed";
-            case NOT_RUN:
-               return "hasn't been executed";
-            case ASSERTION_FAILURE:
-               return "failed in assertion";
-            case UNEXPECTED_ERROR:
-               return "threw unexpected error";
-            case DIDNT_THROW_EXPECTED:
-               return "didn't throw expected error";
-            default:
-               return "unknown failure";
-         };
-      };
-
-      /** @returns Reason for failure or "", if test didn't fail. */
-      const std::string & reason() const {
-         return m_failureString;
-      }
-
-      /** @returns Formatted report of test run. */
-      std::string report() const {
-         return "TEST \"" + name() + "\" " + (failed() ? "✕" : "✓") + " " + status() + ". " + (failed() ? "Reason: " + reason() : "");
+      TestResult result() const 
+      {
+         return { name(), m_statusCode, m_failureString };
       }
    };
 
+   std::ostream & operator << (std::ostream & os, const TestResult & res);
 
-   template <typename E, typename ... A>
-   std::ostream & operator << (std::ostream & os, const Test<E, A...> & test)
+   template <typename ... A>
+   std::ostream & operator << (std::ostream & os, const AnyTest<A...> & test)
    {
-      os <<  "TEST " << TerminalStyle::BOLD
-         << TerminalColor::BRIGHT_BLUE << test.name() << ' '
-         << (test.failed() ? TerminalColor::RED : TerminalColor::GREEN)
-         << test.status();
-
-      if (test.failed()) {
-         os << TerminalStyle::NONE << TerminalColor::RESET
-            << "\n   Reason: "
-            << TerminalColor::YELLOW
-            << test.reason();
-      }
-
-      return os << '\n'<< TerminalStyle::NONE  << TerminalColor::RESET ;
+      return os << test.result();
    }
 };
