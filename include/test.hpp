@@ -114,8 +114,8 @@ namespace fbtt {
    template <typename E, typename ... A>
    std::ostream & operator << (std::ostream & os, const Test<E, A...> & test)
    {
-      os << TerminalStyle::NONE << "TEST "
-         << TerminalColor::BRIGHT_BLUE << TerminalStyle::BOLD << test.name() << ' '
+      os <<  "TEST " << TerminalStyle::BOLD
+         << TerminalColor::BRIGHT_BLUE << test.name() << ' '
          << (test.failed() ? TerminalColor::RED : TerminalColor::GREEN)
          << test.status();
 
@@ -126,6 +126,6 @@ namespace fbtt {
             << test.reason();
       }
 
-      return os << '\n' << TerminalColor::RESET << TerminalStyle::NONE;
+      return os << '\n'<< TerminalStyle::NONE  << TerminalColor::RESET ;
    }
 };
