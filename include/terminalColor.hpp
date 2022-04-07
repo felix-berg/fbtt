@@ -20,9 +20,34 @@ namespace fbtt {
    enum TerminalStyle {
       NONE = 0, BOLD, ITALICS
    };
-   
-   // changing of terminal color & style on given ostream
-   std::ostream & operator << (std::ostream & os, TerminalColor color);
-   std::ostream & operator << (std::ostream & os, TerminalStyle style);
+
+   TerminalStyle g_terminalStyle = TerminalStyle::NONE; // don't change
+   TerminalColor g_terminalColor = TerminalColor::WHITE; // don't change
+
+   void update_ostream_color_and_style(std::ostream & os)
+   {
+      // unix escape code \033
+      os << "\033[" << static_cast<int>(g_terminalStyle) 
+         << ';'     << static_cast<int>(g_terminalColor) 
+         << 'm';
+   }
+
+   std::ostream & operator << (std::ostream & os, TerminalColor color)
+   {
+   #ifdef __unix__
+      g_terminalColor = color;
+      update_ostream_color_and_style(os);
+   #endif
+      return os;
+   };
+
+   std::ostream & operator << (std::ostream & os, TerminalStyle style)
+   {
+   #ifdef __unix__
+      g_terminalStyle = style;
+      update_ostream_color_and_style(os);
+   #endif
+      return os;
+}
 };
 
