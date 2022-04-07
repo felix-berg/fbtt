@@ -26,3 +26,7 @@ concept StorableFunction =
    FunctionWithSignature<Func, ReturnT, Args...>
       &&
    std::convertible_to<Func, std::function<ReturnT(Args...)>>;
+
+
+template <typename ... Cls>
+concept VariadicDefaultInitializable = ((... && std::default_initializable<Cls>));

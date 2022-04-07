@@ -2,6 +2,7 @@
 
 using namespace fbtt;
 
+/** @returns True, if test failed, false otherwise */
 bool TestResult::test_failed() const
 {
    return !(statusCode == PASSED ||

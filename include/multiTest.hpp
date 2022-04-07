@@ -8,11 +8,13 @@
 #include <iomanip>
 
 namespace fbtt {
+   /** Error thrown by MultiTest, when tests are executed, and no constructor is defined. */
    struct NoConstructor : public std::runtime_error  {
       NoConstructor() 
          : std::runtime_error { "No constructor defined! Define a constructor with MultiTest::add_constructor(). "} { };
    };
 
+   /** Error thrown by MultiTest, when an instance in the MultiClass is undefined, after a constructor has been called. */
    struct UndefinedInstance : public std::runtime_error {
       UndefinedInstance()
          : std::runtime_error { "One of the instances of the multitest is undefined! "} { };
@@ -20,10 +22,11 @@ namespace fbtt {
          : std::runtime_error { "An instance is nullptr after constructor: " + s } { };
    };
 
-
-   template <typename ... Cls>
-   concept VariadicDefaultInitializable = ((... && std::default_initializable<Cls>));
-
+   /** MultiTest class. Class for testing 0 or more classes. Constructs class with either default or user-defined (by add_constructor) constructor, and runs every test with the constructed instance[s]. 
+    * @param add_test(): Add test with a name and storable function, that takes references to instances of "Classes..."
+    * @param add_constructor(): Add constructor to be run before every test. Default constructor is automatically added, if every type in "Classes..." is default constructible.
+    * @param run(): Run tests.
+   */
    template <typename ... Classes>
    class MultiTest {
       std::tuple<Classes * ...> m_instanceTuple;
@@ -74,6 +77,9 @@ namespace fbtt {
             delete t;
       }
 
+      /** Add constructor to test. A default constructor is added if possible, but is removed, if a constructor is added by user. 
+       * @param name: Name of constructor
+       * @param constructor: Pointer to storable function with signature void(Classes * & ...) (std::function, function pointer, lambda, non-static member-function...) */
       void add_constructor(const std::string & name, std::function<void(Classes * & ...)> && constructor)
       {
          m_constructors.push_back(
@@ -81,14 +87,17 @@ namespace fbtt {
          m_constructorNames.push_back(name);
       }
 
+      /** Add test to multitest.
+       * @param E: Type of error to expect from the test
+       * @param func: Pointer to storable function with signature void(Classes &...) (std::function, function pointer, lambda, non-static member-functio...) */
       template <ErrorType E = NoError>
-         // requires StorableFunction<Func, void, Classes & ...>
       void add_test(const std::string & testName, std::function<void(Classes &...)> func)
       {  
          AnyTest<Classes &...> * t = new Test<E, Classes & ...>(testName, func);
          m_tests.push_back(t);
       }
 
+      /** Run and evaluate all tests. */
       void run()
       {
          if (m_constructors.size() == 0)

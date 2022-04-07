@@ -29,7 +29,7 @@ namespace fbtt {
       const Status statusCode; // status code for test 
       const std::string failString = ""; // reason for potential test failure
 
-      bool test_failed() const;
+      bool test_failed() const; 
       std::string status() const;
       std::string report() const;
    };
@@ -46,25 +46,38 @@ namespace fbtt {
       virtual TestResult result() const = 0;
    };
 
+   /** Basic test class.
+    * @param Test(): Constructor, where a name and function is given.
+    * @param run(): Run and evaluate result of test
+    * @param result(): Return result of test : TestResult 
+    * @param name(): Returns name of test */
    template <OptionalError ExpectedError = NoError, typename ... TestArgs>
    class Test : public AnyTest<TestArgs...> {
       const std::function<void(TestArgs...)> m_function;
       const std::string m_name;
-
 
       std::string m_failureString = "";
       TestResult::Status m_statusCode = TestResult::Status::NOT_RUN;
 
    public:
       /** Construct a new test around a new name and any storable function.
-       * @param name: Name for constructed test.
-       * @param func: Any storable function (e.g. function, lambda, std::function, non-static member function...) */
+       * @param name: Name for constructed test. */
       Test(const std::string & testName, std::function<void(TestArgs...)> function) 
          : m_function { function },
            m_name { testName } { };
+      
+      /** Construct a new test around a new name and any storable function.
+       * @param name: Name for constructed test.
+       * @param func: Any storable function (e.g. function, lambda, std::function, non-static member function...) */
+      template <typename Function>
+         requires StorableFunction<Function, void, TestArgs...>
+      Test(const std::string & testName,
+      Function && func)
+         : m_function { static_cast<std::function<void(TestArgs...)>> (func) },
+           m_name { testName } { };
 
       /** Run test 
-       * @param args... Arguments to run test with. Will most likely be (). */
+       * @param args... Arguments to run test with. Will most likely be (void). */
       void run(TestArgs ... args) noexcept
       {
          try {
@@ -102,6 +115,7 @@ namespace fbtt {
       /** @returns Name of test */
       const std::string & name() const { return m_name; };
 
+      /** @returns Result of test */
       TestResult result() const 
       {
          return { name(), m_statusCode, m_failureString };
