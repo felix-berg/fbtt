@@ -161,3 +161,4 @@ When the `MultiTest` is output to an output stream, the following output is prod
 std::cout << emptyVectorTest;
 ```
 
+![image](https://user-images.githubusercontent.com/93908883/162222684-288c4df2-ef3b-491a-8871-68b98278e034.png)
