@@ -3,11 +3,12 @@
 #include "assert.hpp"
 #include "errorConcepts.hpp"
 #include "functionConcepts.hpp"
+#include "terminalColor.hpp"
 
 #include <string>
 
 namespace fbtt {
-   template <OptionalError ErrorType = void, typename ... TestArgs>
+   template <OptionalError ExpectedError = NoError, typename ... TestArgs>
    class Test {
       const std::function<void(TestArgs...)> m_function;
       const std::string m_name;
@@ -39,33 +40,27 @@ namespace fbtt {
             m_function(args...);
             
             // --- function didn't throw error ---
-            // if ErrorType is void, test passed
-            if (std::same_as<ErrorType, void>) {
+            // if ExpectedError is void, test passed
+            if (std::same_as<ExpectedError, NoError>) {
                m_statusCode = PASSED;
             } else {
-               // if ErrorType is not void -> we didn't recieve the error, we were expecting
+               // if ExpectedError is not void -> we didn't recieve the error, we were expecting
                m_statusCode = DIDNT_THROW_EXPECTED;
-               m_failureString = "didn't throw error of type: " + std::string(typeid(ErrorType).name());
+               m_failureString = "didn't throw error of type: " + std::string(typeid(ExpectedError).name());
             }
+         
          } catch (AssertionFailure & e) {
             // test threw assertion failure 
-            /* TEST FAILED IN ASSERTION */
-
             m_statusCode = ASSERTION_FAILURE;
             m_failureString = std::string(e.what());
-            
+         } catch (ExpectedError & expected) {
+            // function threw expected error -> pass!
+            m_statusCode = PASSED;
          } catch (std::exception & e) {
-            if (!std::same_as<ErrorType, void> && std::same_as<decltype(e), ErrorType>) {
-               // function threw expected error -> pass!
-               m_statusCode = PASSED;
-               
-               return;
-            } else {
-               // function threw unexpected error -> fail
-               m_statusCode = UNEXPECTED_ERROR;
+            // function threw unexpected error -> fail
+            m_statusCode = UNEXPECTED_ERROR;
+            m_failureString = "threw unexpected error of type: " + std::string(typeid(decltype(e)).name());
 
-               m_failureString = "threw unexpected error of type: " + std::string(typeid(decltype(e)).name());
-            }
          } catch (...) {
             // caught error, that is not derived from std::exception -> unkown failure
             m_statusCode = UNKNOWN_FAILURE;
@@ -111,4 +106,22 @@ namespace fbtt {
       }
    };
 
+
+   template <typename E, typename ... A>
+   std::ostream & operator << (std::ostream & os, const Test<E, A...> & test)
+   {
+      os << TerminalStyle::NONE << "TEST "
+         << TerminalColor::BRIGHT_BLUE << TerminalStyle::BOLD << test.name() << ' '
+         << (test.failed() ? TerminalColor::RED : TerminalColor::GREEN)
+         << test.status();
+
+      if (test.failed()) {
+         os << TerminalStyle::NONE << TerminalColor::RESET
+            << "\n   Reason: "
+            << TerminalColor::YELLOW
+            << test.reason();
+      }
+
+      return os << '\n' << TerminalColor::RESET << TerminalStyle::NONE;
+   }
 };

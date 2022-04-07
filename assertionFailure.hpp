@@ -4,7 +4,7 @@
 
 namespace fbtt {
    class AssertionFailure : public std::exception {
-   private:
+   protected:
       std::string m_msg;
    public:
       AssertionFailure(const std::string & msg)
@@ -28,23 +28,17 @@ namespace fbtt {
 
    template <typename T, typename U>
    struct EqualityAssertionFailure : public AssertionFailure {
-      // for string stream outputtable x and y
-      template <typename S = T, typename X = U>
-         requires ostringstreamOutput<S> && ostringstreamOutput<X>
-      EqualityAssertionFailure(S x, X y, const std::string & msg) 
+      EqualityAssertionFailure(T x, U y, const std::string & msg)
+         : AssertionFailure("") 
       {
-         std::ostringstream res { msg };
-
-         res << " (" << x << ((x == y) ? " == " : " != ") << y << ")";
-
-         AssertionFailure(res.str());
+         if (ostringstreamOutput<T> && ostringstreamOutput<U>) {
+            std::ostringstream res { msg };
+            res << " (" << x << ((x == y) ? " == " : " != ") << y << ")";
+            m_msg = res.str();
+         } else {
+            m_msg = msg + "(equality assertion)";
+         }
       }
-
-      // for not string stream outputtable x and y
-      template <typename S = T, typename X = U>
-         requires (!ostringstreamOutput<S> || !ostringstreamOutput<X>)
-      EqualityAssertionFailure(S x, X y, const std::string msg)
-         : AssertionFailure { msg + " (equality assertion)" } { }
    };
 
    template <typename Error>
