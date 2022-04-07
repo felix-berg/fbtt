@@ -1,6 +1,6 @@
 #pragma once
 
-#include "assert.hpp"
+#include "assertionFailure.hpp"
 #include "errorConcepts.hpp"
 #include "functionConcepts.hpp"
 #include "terminalColor.hpp"
@@ -26,13 +26,17 @@ namespace fbtt {
       Status m_statusCode;
 
    public:
+      /** Construct a new test around a new name and any storable function.
+       * @param name: Name for constructed test.
+       * @param func: Any storable function (e.g. function, lambda, std::function, non-static member function...) */
       template <typename Func>
          requires StorableFunction<Func, void, TestArgs...>
       Test(const std::string & testName, Func function) 
          : m_function { static_cast<std::function<void(TestArgs...)>> ( function ) },
            m_name { testName } { };
 
-      /** Run test. Arguments to test function are supplied through args.*/
+      /** Run test 
+       * @param args... Arguments to run test with. Will most likely be (). */
       void run(TestArgs ... args) noexcept
       {
          try {
