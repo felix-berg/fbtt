@@ -76,9 +76,14 @@ namespace fbtt {
          : m_function { static_cast<std::function<void(TestArgs...)>> (func) },
            m_name { testName } { };
 
+      Test (const Test<ExpectedError, TestArgs...> &) = delete;
+      Test & operator = (const Test<ExpectedError, TestArgs...> &) = delete;
+      Test (Test<ExpectedError, TestArgs...> &&) = default;
+      Test & operator = (Test<ExpectedError, TestArgs...> &&) = default;
+
       /** Run test 
        * @param args... Arguments to run test with. Will most likely be (void). */
-      void run(TestArgs ... args) noexcept
+      virtual void run(TestArgs ... args) noexcept
       {
          try {
             // try running function
@@ -113,10 +118,10 @@ namespace fbtt {
       }
 
       /** @returns Name of test */
-      const std::string & name() const { return m_name; };
+      virtual const std::string & name() const { return m_name; };
 
       /** @returns Result of test */
-      TestResult result() const 
+      virtual TestResult result() const 
       {
          return { name(), m_statusCode, m_failureString };
       }

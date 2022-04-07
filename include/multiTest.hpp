@@ -157,16 +157,12 @@ namespace fbtt {
       os << TerminalColor::WHITE <<  TerminalStyle::BOLD  
          << "Summary of multi test: \"" + multiTest.m_name << "\"\n";
       
-      for (size_t consi = 0; consi < multiTest.m_constructors.size(); consi++) {
-         os << TerminalColor::RED << TerminalStyle::BOLD
-            << "### " 
-            << TerminalColor::WHITE << TerminalStyle::NONE
-            << "Constructor: \""
+      for (size_t consi = 0; consi < multiTest.m_constructors.size(); consi++) { 
+         os << TerminalColor::WHITE << TerminalStyle::NONE
+            << "With constructor: \""
             << TerminalColor::CYAN  << TerminalStyle::BOLD 
             << multiTest.m_constructorNames[consi] 
-            << TerminalColor::WHITE << TerminalStyle::NONE << "\"" 
-            << TerminalColor::RED   << TerminalStyle::BOLD
-            << " ###\n";
+            << TerminalColor::WHITE << TerminalStyle::NONE << "\":\n";
 
          for (size_t testi = 0; testi < multiTest.m_tests.size(); testi++)
          {
