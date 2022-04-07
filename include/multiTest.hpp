@@ -5,6 +5,7 @@
 #include <tuple>
 #include <functional>
 #include <iostream>
+#include <iomanip>
 
 namespace fbtt {
    struct NoConstructor : public std::runtime_error  {
@@ -15,7 +16,13 @@ namespace fbtt {
    struct UndefinedInstance : public std::runtime_error {
       UndefinedInstance()
          : std::runtime_error { "One of the instances of the multitest is undefined! "} { };
+      UndefinedInstance(const std::string & s)
+         : std::runtime_error { "An instance is nullptr after constructor: " + s } { };
    };
+
+
+   template <typename ... Cls>
+   concept VariadicDefaultInitializable = ((... && std::default_initializable<Cls>));
 
    template <typename ... Classes>
    class MultiTest {
@@ -35,10 +42,10 @@ namespace fbtt {
       template <typename ... Cls>
       friend std::ostream & operator << (std::ostream & os, const MultiTest<Cls...> & multiTest);
 
-      std::function<bool(Classes * ... instances)> check_instances = 
+      std::function<bool(Classes * ... instances)> instances_are_nullptr = 
          [](Classes * ... instances) -> bool
       {
-         return ((... && (instances != nullptr)));
+         return ((... || (instances == nullptr)));
       };
 
       std::function<void(Classes * ... instances)> destruct = 
@@ -47,20 +54,16 @@ namespace fbtt {
          ((delete instances), ...);
       };
 
+      std::function<void(Classes * & ... instances)> set_instances_to_null =
+         [](Classes * & ... instances) 
+      {
+         ((instances = nullptr), ...);
+      };
+
    public:
       MultiTest(const std::string & name)
          : m_name { name }
-      {
-         bool allDefaultible = true;
-
-         // check for default_initializable in every class
-         ((allDefaultible = allDefaultible && std::default_initializable<Classes>
-         ), ...);
-
-         if (allDefaultible)
-            add_default_constructor_to_multitest(*this);
-         
-      }
+      { }
 
       MultiTest()
          : m_name { "Unnamed" } { };
@@ -71,18 +74,16 @@ namespace fbtt {
             delete t;
       }
 
-      template <typename Func>
-         requires StorableFunction<Func, void, Classes * & ...>
-      void add_constructor(const std::string & name, Func && constructor)
+      void add_constructor(const std::string & name, std::function<void(Classes * & ...)> && constructor)
       {
          m_constructors.push_back(
             static_cast<std::function<void(Classes * &...)>> (constructor));
          m_constructorNames.push_back(name);
       }
 
-      template <ErrorType E = NoError, typename Func>
-         requires StorableFunction<Func, void, Classes & ...>
-      void add_test(const std::string & testName, Func && func)
+      template <ErrorType E = NoError>
+         // requires StorableFunction<Func, void, Classes & ...>
+      void add_test(const std::string & testName, std::function<void(Classes &...)> func)
       {  
          AnyTest<Classes &...> * t = new Test<E, Classes & ...>(testName, func);
          m_tests.push_back(t);
@@ -91,17 +92,28 @@ namespace fbtt {
       void run()
       {
          if (m_constructors.size() == 0)
-            throw NoConstructor();
+            if (VariadicDefaultInitializable<Classes...>)
+               add_default_constructor_to_multitest(*this);
+            else
+               throw NoConstructor();
 
          for (size_t i = 0; i < m_constructors.size(); i++) {
             for (size_t j = 0; j < m_tests.size(); j++) {
+               std::apply(set_instances_to_null, m_instanceTuple);
+
                std::apply(m_constructors[i], m_instanceTuple);
-               std::apply(check_instances, m_instanceTuple);
 
                std::apply([&](Classes * ... instances) {
-                  m_tests[i]->run(*instances...);
-                  m_testResults.push_back(m_tests[i]->result());
+                  if (instances_are_nullptr(instances...))
+                     throw UndefinedInstance(m_constructorNames[i]);
                }, m_instanceTuple);
+
+               std::apply([&](Classes * ... instances) {
+                  m_tests[j]->run(*instances...);
+               }, m_instanceTuple);
+
+               // push back result of test
+               m_testResults.push_back(m_tests[j]->result());
 
                std::apply(destruct, m_instanceTuple);
             }
@@ -109,9 +121,6 @@ namespace fbtt {
          finished = true;
       }
    };
-
-   template <typename ... Cls>
-   concept VariadicDefaultInitializable = ((... && std::default_initializable<Cls>));
 
    // for multi tests, where every class is default initializable
    template <typename ... Cls>
@@ -143,7 +152,7 @@ namespace fbtt {
          os << TerminalColor::RED
             << "### " 
             << TerminalColor::WHITE << TerminalStyle::NONE
-            << "Constructor " << consi << ": \""
+            << "Constructor: \""
             << TerminalColor::CYAN  << TerminalStyle::BOLD 
             << multiTest.m_constructorNames[consi] 
             << TerminalColor::WHITE << TerminalStyle::NONE << "\"" 
@@ -152,25 +161,29 @@ namespace fbtt {
 
          for (size_t testi = 0; testi < multiTest.m_tests.size(); testi++)
          {
-            int resultid = testi + consi * multiTest.m_testResults.size();
+            int resultid = testi + consi * multiTest.m_tests.size();
 
             const TestResult & res = multiTest.m_testResults.at(resultid);
 
             os << TerminalColor::WHITE << TerminalStyle::NONE
                << "   TEST " 
-               << TerminalColor::BLUE << TerminalStyle::BOLD
-               << "\"" << res.testName << "\" " 
+               << std::setw(2) << testi << " "
                << (res.test_failed() ? 
                      TerminalColor::RED :
                      TerminalColor::GREEN)
-               << res.status();
+               << res.status()
+               << TerminalColor::GRAY
+               << " - "
+               << TerminalColor::BLUE << TerminalStyle::BOLD
+               << "\"" << res.testName << "\"";
 
             if (res.test_failed()) {
                os << TerminalColor::WHITE << TerminalStyle::NONE 
                   << "\n      Reason: "
-                  << TerminalColor::YELLOW
-                  << res.failString << '\n';
+                  << TerminalColor::YELLOW << TerminalStyle::BOLD
+                  << res.failString;
             }
+            os << '\n' << TerminalColor::WHITE << TerminalStyle::NONE;
          }
       }
    

@@ -95,28 +95,69 @@ assert_throws<ErrorType>(Function f, Args ... args);
 assert_throws<FactorialError>(factorial, -1);
 ```
 
-#### Assert throws specific message
-```C++ 
-assert_throws_message(const std::string & errorMsg, Function f, Args ... args);
-```
-- Assert, that `f` throws an error with message `errorMsg`, when invoked with `(args...)`
+## Test of Class: std::vector
+To show an example of how a class could be tested with the `fbtt::MultiTest<>` class, the following example will test the standard library `std::vector`.
 
-##### Example usage
+A MultiTest is declared by giving the test a name, and passing template parameters of the different classes, you wish to test.
+
+Here, we are testing the empty `std::vector<int>` class.
 ```C++
-// Assert, that factorial(100) throws error with message "Integer overflow".
-assert_throws_message("Integer overflow", factorial, 100);
-```
+using namespace fbtt;
+//...
 
-#### Assert throws (method call)
-```C++ 
-assert_method_throws<ErrorType>(Class obj, MethodPtr m, Args ... args);
+MultiTest<std::vector<int>> emptyVectorTest;
 ```
-- For non-static member functions: Assert that member function `m` (e.g. `&Class::method`) 
-  throws and exception of type `ErrorType` when invoked with `(args...)`.
+A simple test can be added. For instance, a vectors `::resize()` and `::size()` methods can be tested.
 
-##### Example usage
 ```C++
-std::vector<int> empty;
-// assert that empty.resize(-1) throws an std::length_error
-assert_method_throws<std::length_error>(empty, &std::vector<int>::resize, -1);
+emptyVectorTest.add_test(
+   "When resized to x, has size x", [](std::vector<int> & vector)
+   {
+      vector.resize(20);
+      assert_equals(vector.size(), 20);
+   }
+)
 ```
+As you can see, the lambda function is passed an instance of `std::vector<int>` by reference. 
+
+Because `std::vector<int>` has a default constructor, an instance is constructed by default before every test. If this is not possible, (if you have a class, which has no default constructer) a constructor can be added with `MultiTest::add_constructor()`
+```C++
+emptyVectorTest.add_constructor(
+   "initializing with 0", [](std::vector<int> * & vec)
+   {
+      vec = new std::vector<int>(0);
+   }
+)
+```
+If this is defined, the tests will begin with this constructor, instead of the predefined constructor. Any number of constructors can be added to the `MultiTest`.
+
+Constructors added with `add_constructor` must allocate to free store with `new`.
+
+### Flow of testing
+When `MultiClass::run()` is called, the following happens (assume 2 constructors, 3 tests):
+
+- The **1st constructor** is called
+   - The **1st** test is executed
+- The destructor is called (`delete` on object)
+- The **1st constructor** is called
+   - The **2nd** test is executed
+- The destructor is called
+- The **1st constructor** is called
+   - The **3rd** test is executed
+- The destructor is called
+- 
+- The **2nd constructor** is called
+   - The **1st** test is executed
+- The destructor is called (`delete` on object)
+- The **2nd constructor** is called
+   - The **2nd** test is executed
+- The destructor is called
+- The **2nd constructor** is called
+   - The **3rd** test is executed
+- The destructor is called
+
+When the `MultiTest` is output to an output stream, the following output is produced:
+```C++
+std::cout << emptyVectorTest;
+```
+
