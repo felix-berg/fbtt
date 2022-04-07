@@ -120,3 +120,4 @@ std::vector<int> empty;
 // assert that empty.resize(-1) throws an std::length_error
 assert_method_throws<std::length_error>(empty, &std::vector<int>::resize, -1);
 ```
+![image](https://user-images.githubusercontent.com/93908883/162222429-ad6d774e-8183-4c8f-a966-03bc23e3c479.png)
