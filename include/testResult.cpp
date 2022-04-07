@@ -42,11 +42,11 @@ std::ostream & fbtt::operator << (std::ostream & os, const TestResult & res)
       << res.status();
 
    if (res.test_failed()) {
-      os << TerminalStyle::NONE << TerminalColor::RESET
+      os << TerminalStyle::NONE << TerminalColor::WHITE
          << "\n      Reason: "
          << TerminalColor::YELLOW
          << res.failString;
    }
 
-   return os << '\n'<< TerminalStyle::NONE  << TerminalColor::RESET;
+   return os << '\n'<< TerminalStyle::NONE  << TerminalColor::WHITE;
 }

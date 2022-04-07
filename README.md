@@ -29,7 +29,7 @@ This will, if the function passed, produce the following output:
 ![image](https://user-images.githubusercontent.com/93908883/161978697-196a918c-93a7-4f45-927b-db27275fa879.png)
 
 
-If the function had failed, if `factorial(5)` had been evaluated, to `121`, the test result would have been:
+If the function had failed, if `factorial(5)` had been evaluated to `121`, the test result would have been:
 
 ![image](https://user-images.githubusercontent.com/93908883/161979104-1f129abd-7a83-4988-8b23-af4fe59c22cb.png)
 
@@ -120,6 +120,16 @@ emptyVectorTest.add_test(
 ```
 As you can see, the lambda function is passed an instance of `std::vector<int>` by reference. 
 
+Another function may be created. This function could be a test of an error, thrown by `std::vector<int>`. If you want to test for an error, you can add an expected error to the test as a template parameter:
+```C++
+emptyVectorTest.add_test<std::out_of_range>(
+   "When referencing element -1 with ::at(), throws out of range", 
+   [](auto & vec) {
+      vec.at(-1);
+   }
+);
+```
+
 Because `std::vector<int>` has a default constructor, an instance is constructed by default before every test. If this is not possible, (if you have a class, which has no default constructer) a constructor can be added with `MultiTest::add_constructor()`
 ```C++
 emptyVectorTest.add_constructor(
@@ -158,7 +168,20 @@ When `MultiClass::run()` is called, the following happens (assume 2 constructors
 
 When the `MultiTest` is output to an output stream, the following output is produced:
 ```C++
-std::cout << emptyVectorTest;
+std::cout << multiTest;
 ```
-
 ![image](https://user-images.githubusercontent.com/93908883/162222684-288c4df2-ef3b-491a-8871-68b98278e034.png)
+This multitest can be found in `"examples/vectorTest.cpp"`.
+
+
+#### Comment about `add_constructor`
+The `MultiTest::add_constructor`-method takes a function pointer as its second argument. This function pointer has the signature `void(Classes * & ...)`.
+This would, for a test with `std::vector<int>` mean, that the signature is `void(std::vector<int> * &)`. This has been done, so simple construction functions would remain simple, e.g.:
+
+```C++
+test.add_constructor(
+   "Simple constructor for T", [](T * & t) {
+      t = new T { x, y, z };
+   }
+);
+```

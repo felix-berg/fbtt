@@ -14,6 +14,12 @@ int main()
    MultiTest<std::vector<int>> emptyVectorTest { "Test of empty vector" };
 
    emptyVectorTest.add_constructor(
+      "Default constructor", [](auto * & vec) {
+         vec = new std::vector<int>;
+      }
+   );
+
+   emptyVectorTest.add_constructor(
       "Construct with size 0", [](auto * & vec) {
          vec = new std::vector<int> (0);
       }

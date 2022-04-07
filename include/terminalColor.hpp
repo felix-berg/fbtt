@@ -12,8 +12,7 @@ namespace fbtt {
       BRIGHT_RED, BRIGHT_GREEN, 
       BRIGHT_YELLOW, BRIGHT_BLUE, 
       BRIGHT_MAGENTA, BRIGHT_CYAN, 
-      BRIGHT_WHITE, 
-      RESET = 0
+      BRIGHT_WHITE
    };
 
    /** Enumeration for terminal color. Can be used on an ostream to output text in different styles on
