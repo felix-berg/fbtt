@@ -42,6 +42,17 @@ namespace fbtt {
          throw EqualityAssertionFailure(x, y, onFail);
    }
 
+   /** Asserts that x is approximately equal to y -> within given margin (defaults to 0.00001f).
+    * @param onFail: String for AssertionFailure, if the assertion fails. Defaults to ""
+    * @throws Throws AssertionFailure if x is not within the margin of y. */
+   template <typename T, typename U>
+      requires std::three_way_comparable_with<T, U>
+   void assert_approx(T x, U y, const std::string & onFail = "", float margin = 0.00001f)
+   {
+      if (x < y - margin || y + margin < x) 
+         throw EqualityAssertionFailure(x, y, onFail);
+   }
+
    /** Assert that x is not equal to y
     * @param onFail: String for AssertionFailure, if the assertion fails. Defaults to ""
     * @throws Throws AssertionFailure if x and y are equal. */
