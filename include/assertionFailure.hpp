@@ -34,9 +34,9 @@ namespace fbtt {
          : AssertionFailure("") 
       {
          if (ostringstreamOutput<T> && ostringstreamOutput<U>) {
-            std::ostringstream res { msg };
+            std::ostringstream res { };
             res << " (" << x << ((x == y) ? " == " : " != ") << y << ")";
-            m_msg = res.str();
+            m_msg = msg + res.str();
          } else {
             m_msg = msg + "(equality assertion)";
          }
