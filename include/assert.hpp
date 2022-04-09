@@ -36,7 +36,7 @@ namespace fbtt {
     * @throws Throws AssertionFailure if x and y are not equal. */
    template <typename T, typename U>
       requires std::equality_comparable_with<T, U>
-   void assert_equals(T x, U y, const std::string & onFail = "") 
+   void assert_equals(const T & x, const U & y, const std::string & onFail = "") 
    {
       if (x != y)
          throw EqualityAssertionFailure(x, y, onFail);
@@ -47,7 +47,7 @@ namespace fbtt {
     * @throws Throws AssertionFailure if x is not within the margin of y. */
    template <typename T, typename U>
       requires std::three_way_comparable_with<T, U>
-   void assert_approx(T x, U y, const std::string & onFail = "", float margin = 0.0001f)
+   void assert_approx(const T & x, const U & y, const std::string & onFail = "", float margin = 0.0001f)
    {
       if (x < y - margin || y + margin < x) 
          throw EqualityAssertionFailure(x, y, onFail);
@@ -58,7 +58,7 @@ namespace fbtt {
     * @throws Throws AssertionFailure if x and y are equal. */
    template <typename T, typename U>
       requires std::equality_comparable_with<T, U>
-   void assert_noteq(T x, U y, const std::string & onFail = "")
+   void assert_noteq(const T & x, const U & y, const std::string & onFail = "")
    {
       if (x == y)
          throw EqualityAssertionFailure(x, y, onFail);

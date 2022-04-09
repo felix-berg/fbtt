@@ -30,7 +30,7 @@ namespace fbtt {
 
    template <typename T, typename U>
    struct EqualityAssertionFailure : public AssertionFailure {
-      EqualityAssertionFailure(T x, U y, const std::string & msg)
+      EqualityAssertionFailure(const T & x, const U & y, const std::string & msg)
          : AssertionFailure("") 
       {
          if (ostringstreamOutput<T> && ostringstreamOutput<U>) {
