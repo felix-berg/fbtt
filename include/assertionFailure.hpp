@@ -24,22 +24,33 @@ namespace fbtt {
       { };
    };
 
-   template <typename T>
+      template <typename T>
    concept ostringstreamOutput = 
       requires (std::ostringstream & os, T t) { os << t; };
+
+   template <typename T, typename U>
+      requires ostringstreamOutput<T> 
+            && ostringstreamOutput<U>
+   void add_equality_string_to_string(std::string & s, const T & x, const U & y)
+   {
+      std::ostringstream res { };
+      res << " (" << x << ((x == y) ? " == " : " != ") << y << ")";
+      s += res.str();
+   }
+
+   template <typename T, typename U>
+      requires (!ostringstreamOutput<T> || !ostringstreamOutput<U>)
+   void add_equality_string_to_string(std::string & s, const T &, const U &)
+   {
+      s += "(equality assertion)";
+   }
 
    template <typename T, typename U>
    struct EqualityAssertionFailure : public AssertionFailure {
       EqualityAssertionFailure(const T & x, const U & y, const std::string & msg)
          : AssertionFailure("") 
       {
-         if (ostringstreamOutput<T> && ostringstreamOutput<U>) {
-            std::ostringstream res { };
-            res << " (" << x << ((x == y) ? " == " : " != ") << y << ")";
-            m_msg = msg + res.str();
-         } else {
-            m_msg = msg + "(equality assertion)";
-         }
+         add_equality_string_to_string(m_msg, x, y);
       }
    };
 
