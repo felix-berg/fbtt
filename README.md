@@ -63,7 +63,7 @@ assert_false(dog.isBarking(), "Dog is barking");
 ```C++ 
 assert_equals(T x, T y, const std::string & onFail = "");
 ```
-- Assert that value `x` and `y` of type `T` are equal
+- Assert that value `x` and `y` of equality-comparaple types `T` and `U` are equal
    - `onFail`: String to error, if assertion fails. Defaults to "".
 
 ##### Example usage
@@ -73,9 +73,9 @@ assert_equals(factorial(5), 120, "Factorial 5 is not equal to 120");
 ```
 #### Assert equals
 ```C++ 
-assert_noteq(T x, T y, const std::string & onFail = "");
+assert_noteq(T x, U y, const std::string & onFail = "");
 ```
-- Assert that value `x` and `y` of type `T` are not equal
+- Assert that value `x` and `y` of equality-comparaple types `T` and `U` are not equal
    - `onFail`: String to error, if assertion fails. Defaults to "".
 
 ##### Example usage
