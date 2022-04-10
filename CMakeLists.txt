@@ -17,9 +17,16 @@ configure_file(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
 
 target_include_directories(${PROJECT_NAME} INTERFACE include)
 
-install(TARGETS ${PROJECT_NAME}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
+# provides support for make install
+install(
+    FILES include/assert.hpp
+        include/assertionFailure.hpp
+        include/errorConcepts.hpp
+        include/fbtt.hpp
+        include/functionConcepts.hpp
+        include/multiTest.hpp
+        include/terminalColor.hpp
+        include/test.hpp
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
