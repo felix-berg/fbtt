@@ -34,7 +34,7 @@ namespace fbtt {
       
       std::vector<std::function<void(Classes * & ...)>> m_constructors;
       std::vector<std::string> m_constructorNames;
-      std::vector<AnyTest<Classes & ...> *> m_tests;
+      std::vector<AbstractTest<Classes & ...> *> m_tests;
       std::vector<TestResult> m_testResults;
       
       std::string m_name;
@@ -94,7 +94,7 @@ namespace fbtt {
       template <ErrorType E = NoError>
       void add_test(const std::string & testName, std::function<void(Classes &...)> func)
       {  
-         AnyTest<Classes &...> * t = new Test<E, Classes & ...>(testName, func);
+         AbstractTest<Classes &...> * t = new Test<E, Classes & ...>(testName, func);
          m_tests.push_back(t);
       }
 

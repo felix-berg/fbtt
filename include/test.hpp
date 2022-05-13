@@ -11,7 +11,7 @@ namespace fbtt {
    /** Container for result of a test. Gotten with Test::Result
     * @param testName: Name of test
     * @param failString: Error message for test
-    * @param test_faileid(): True, if test failed, false otherwise
+    * @param test_failed(): True, if test failed, false otherwise
     * @param status(): String indicating the status of the test
     * @param report(): Combined information about the testresult
    */
@@ -36,11 +36,11 @@ namespace fbtt {
 
    // abstract base class for any test with any error type
    // used, so multiclasstest can have multiple different
-   // types of tests in a single vector of <AnyTest *>
+   // types of tests in a single vector of <AbstractTest *>
    template <typename ... TestArgs>
-   class AnyTest { 
+   class AbstractTest { 
    public:
-      AnyTest() { };
+      AbstractTest() { };
       virtual void run(TestArgs...) = 0;
       virtual const std::string & name() const = 0;
       virtual TestResult result() const = 0;
@@ -52,7 +52,7 @@ namespace fbtt {
     * @param result(): Return result of test : TestResult 
     * @param name(): Returns name of test */
    template <OptionalError ExpectedError = NoError, typename ... TestArgs>
-   class Test : public AnyTest<TestArgs...> {
+   class Test : public AbstractTest<TestArgs...> {
       const std::function<void(TestArgs...)> m_function;
       const std::string m_name;
 
@@ -130,7 +130,7 @@ namespace fbtt {
    std::ostream & operator << (std::ostream & os, const TestResult & res);
 
    template <typename ... A>
-   std::ostream & operator << (std::ostream & os, const AnyTest<A...> & test)
+   std::ostream & operator << (std::ostream & os, const AbstractTest<A...> & test)
    {
       return os << test.result();
    }
