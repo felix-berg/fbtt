@@ -17,7 +17,6 @@ configure_file(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
 
 target_include_directories(${PROJECT_NAME} INTERFACE include)
 
-
 # provides support for make install
 install(
     FILES include/assert.hpp
@@ -28,5 +27,5 @@ install(
         include/multiTest.hpp
         include/terminalColor.hpp
         include/test.hpp
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
