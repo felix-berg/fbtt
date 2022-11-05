@@ -101,11 +101,12 @@ namespace fbtt {
       /** Run and evaluate all tests. */
       void run()
       {
-         if (m_constructors.size() == 0)
+         if (m_constructors.size() == 0) {
             if (VariadicDefaultInitializable<Classes...>)
                add_default_constructor_to_multitest(*this);
             else
                throw NoConstructor();
+         }
 
          for (size_t i = 0; i < m_constructors.size(); i++) {
             for (size_t j = 0; j < m_tests.size(); j++) {
