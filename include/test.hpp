@@ -44,6 +44,7 @@ namespace fbtt {
       virtual void run(TestArgs...) = 0;
       virtual const std::string & name() const = 0;
       virtual TestResult result() const = 0;
+      virtual ~AbstractTest() { };
    };
 
    /** Basic test class.
@@ -125,6 +126,8 @@ namespace fbtt {
       {
          return { name(), m_statusCode, m_failureString };
       }
+
+      virtual ~Test() { };
    };
 
    std::ostream & operator << (std::ostream & os, const TestResult & res);

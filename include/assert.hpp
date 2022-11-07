@@ -35,33 +35,33 @@ namespace fbtt {
     * @param onFail: String for AssertionFailure, if the assertion fails. Defaults to ""
     * @throws Throws AssertionFailure if x and y are not equal. */
    template <typename T, typename U>
-      requires std::equality_comparable_with<T, U>
+      requires (std::equality_comparable<T> && std::convertible_to<T, U>)
    void assert_equals(const T & x, const U & y, const std::string & onFail = "") 
    {
-      if (x != y)
-         throw EqualityAssertionFailure(x, y, onFail);
+      if (x != T(y))
+         throw EqualityAssertionFailure(x, T(y), onFail);
    }
 
    /** Asserts that x is approximately equal to y -> within given margin (defaults to 0.0001f).
     * @param onFail: String for AssertionFailure, if the assertion fails. Defaults to ""
     * @throws Throws AssertionFailure if x is not within the margin of y. */
    template <typename T, typename U>
-      requires std::three_way_comparable_with<T, U>
+      requires (std::three_way_comparable<T> && std::convertible_to<T, U>)
    void assert_approx(const T & x, const U & y, const std::string & onFail = "", float margin = 0.0001f)
    {
-      if (x < y - margin || y + margin < x) 
-         throw EqualityAssertionFailure(x, y, onFail);
+      if (x < T(y) - margin || T(y) + margin < x) 
+         throw EqualityAssertionFailure(x, T(y), onFail);
    }
 
    /** Assert that x is not equal to y
     * @param onFail: String for AssertionFailure, if the assertion fails. Defaults to ""
     * @throws Throws AssertionFailure if x and y are equal. */
    template <typename T, typename U>
-      requires std::equality_comparable_with<T, U>
+      requires (std::equality_comparable<T> && std::convertible_to<T, U>)
    void assert_noteq(const T & x, const U & y, const std::string & onFail = "")
    {
-      if (x == y)
-         throw EqualityAssertionFailure(x, y, onFail);
+      if (x == T(y))
+         throw EqualityAssertionFailure(x, T(y), onFail);
    }
 
    /** Assert, that the given function throws instance of ErrorType. 
