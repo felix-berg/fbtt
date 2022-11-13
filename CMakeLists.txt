@@ -8,13 +8,10 @@ include(GNUInstallDirs)
 
 add_library(fbtt INTERFACE)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-   PUBLIC_HEADER include/fbtt.hpp
-)
-
 configure_file(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
 
-target_include_directories(${PROJECT_NAME} INTERFACE include)
+target_include_directories(${PROJECT_NAME}
+        INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
 # provides support for make install
 install(
