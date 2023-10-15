@@ -30,7 +30,7 @@ namespace fbtt {
 
    template <typename T>
       requires ostringstreamOutput<T>
-   void add_equality_string_to_string(std::string & s, const T & x, const T & y)
+   void addEqualityStringToString(std::string & s, const T & x, const T & y)
    {
       std::ostringstream res { };
       res << " (" << x << ((x == y) ? " == " : " != ") << y << ")";
@@ -39,7 +39,7 @@ namespace fbtt {
 
    template <typename T>
       requires (!ostringstreamOutput<T>)
-   void add_equality_string_to_string(std::string & s, const T &, const T &)
+   void addEqualityStringToString(std::string & s, const T& x, const T& y)
    {
       s += "(equality assertion)";
    }
@@ -49,7 +49,7 @@ namespace fbtt {
       EqualityAssertionFailure(const T & x, const T & y, const std::string & msg)
          : AssertionFailure("") 
       {
-         add_equality_string_to_string(m_msg, x, y);
+          addEqualityStringToString(m_msg, x, y);
       }
    };
 

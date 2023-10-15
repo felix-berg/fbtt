@@ -6,86 +6,86 @@ int main()
 {
    MultiTest<std::vector<int>> emptyVectorTest { "Test of empty vector" };
 
-   emptyVectorTest.add_constructor(
-      "Default constructor", [](auto * & vec) {
-         vec = new std::vector<int>;
-      }
-   );
+    emptyVectorTest.addConstructor(
+        "Default constructor", [](auto*& vec) {
+            vec = new std::vector<int>;
+        }
+    );
 
-   emptyVectorTest.add_constructor(
-      "Construct with size 0", [](auto * & vec) {
-         vec = new std::vector<int> (0);
-      }
-   );
-   
+    emptyVectorTest.addConstructor(
+        "Construct with size 0", [](auto*& vec) {
+            vec = new std::vector<int>(0);
+        }
+    );
 
-   emptyVectorTest.add_test(
-      "new vector is empty", [](auto & vec) {
-         assert_equals(vec.size(), 0, "Vector size is not 0");
-         assert_true(vec.empty(), "Vector is not empty");
-         assert_equals(vec.capacity(), 0, "Vector capacity is not 0");
-      }
-   );
+    emptyVectorTest.addTest(
+        "new vector is empty", [](auto& vec) {
+            assertEquals(vec.size(), 0, "Vector size is not 0");
+            assertTrue(vec.empty(), "Vector is not empty");
+            assertEquals(vec.capacity(), 0, "Vector capacity is not 0");
+        }
+    );
 
-   emptyVectorTest.add_test<std::length_error>(
-      "resize to -1 throws length-error", [](auto & vec) {
-         vec.resize(-1);
-      }
-   );
+    emptyVectorTest.addTest<std::length_error>(
+        "resize to -1 throws length-error", [](auto& vec) {
+            vec.resize(-1);
+        }
+    );
 
-   emptyVectorTest.add_test<std::out_of_range>(
-      "accessing out of range throws out of range", [](auto & vec) {
-         vec.resize(20);
-         vec.at(-1);
-         vec.at(21);
-      }
-   );
+    emptyVectorTest.addTest<std::out_of_range>(
+        "accessing out of range throws out of range", [](auto& vec) {
+            vec.resize(20);
+            vec.at(-1);
+            vec.at(21);
+        }
+    );
 
-   emptyVectorTest.add_test(
-      "reserving x leads to capacity x", [](auto & vec) {
-         vec.reserve(20);
-         assert_equals(20, vec.capacity());
-      }
-   );
+    emptyVectorTest.addTest(
+        "reserving x leads to capacity x", [](auto& vec) {
+            vec.reserve(20);
+            assertEquals(20, vec.capacity());
+        }
+    );
 
-   emptyVectorTest.add_test(
-      "first in, last out", [](auto & vec) {
-         vec.push_back(32);
-         vec.push_back(23);
-         assert_equals(vec.back(), 23);
-         vec.pop_back();
-         assert_equals(vec.back(), 32);
-         vec.pop_back();
-      }
-   );
+    emptyVectorTest.addTest(
+        "first in, last out", [](auto& vec) {
+            vec.push_back(32);
+            vec.push_back(23);
+            assertEquals(vec.back(), 23);
+            vec.pop_back();
+            assertEquals(vec.back(), 32);
+            vec.pop_back();
+        }
+    );
 
-   emptyVectorTest.add_test(
-      "setting element i to x, leads to element i having the value of x", [](auto & vec) {
-         vec.resize(10);
-         vec[9] = 3;
-         assert_equals(vec[9], 3);
-      }
-   );
+    emptyVectorTest.addTest(
+        "setting element i to x, leads to element i having the value of x",
+        [](auto& vec) {
+            vec.resize(10);
+            vec[9] = 3;
+            assertEquals(vec[9], 3);
+        }
+    );
 
-   emptyVectorTest.add_test(
-      "resizing vector with x leads to filled with x", [](auto & vec) {
-         vec.resize(130, -1325);
+    emptyVectorTest.addTest(
+        "resizing vector with x leads to filled with x", [](auto& vec) {
+            vec.resize(130, -1325);
 
-         for (int & i : vec)
-            assert_equals(i, -1325);
-      }
-   );
+            for (int& i: vec)
+                assertEquals(i, -1325);
+        }
+    );
 
-   emptyVectorTest.add_test(
-       "failing test", [](auto& vec) {
-            assert_false(true);
-       }
-   );
+    emptyVectorTest.addTest(
+        "failing test", [](auto& vec) {
+            assertFalse(true);
+        }
+    );
 
    std::cout << "Running tests...\n";
    emptyVectorTest.run();
 
    std::cout << emptyVectorTest;
 
-   return get_error_code(emptyVectorTest.get_results());
+   return getErrorCode(emptyVectorTest.getResults());
 }

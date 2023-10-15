@@ -12,7 +12,7 @@ namespace fbtt {
    /** Error thrown by MultiTest, when tests are executed, and no constructor is defined. */
    struct NoConstructor : public std::runtime_error  {
       NoConstructor() 
-         : std::runtime_error { "No constructor defined! Define a constructor with MultiTest::add_constructor(). "} { };
+         : std::runtime_error { "No constructor defined! Define a constructor with MultiTest::addConstructor(). "} { };
    };
 
    /** Error thrown by MultiTest, when an instance in the MultiClass is undefined, after a constructor has been called. */
@@ -23,7 +23,7 @@ namespace fbtt {
          : std::runtime_error { "An instance is nullptr after constructor: " + s } { };
    };
 
-   /** MultiTest class. Class for testing 0 or more classes. Constructs class with either default or user-defined (by add_constructor) constructor, and runs every test with the constructed instance[s]. 
+   /** MultiTest class. Class for testing 0 or more classes. Constructs class with either default or user-defined (by addConstructor) constructor, and runs every test with the constructed instance[s].
     * @param add_test(): Add test with a name and storable function, that takes references to instances of "Classes..."
     * @param add_constructor(): Add constructor to be run before every test. Default constructor is automatically added, if every type in "Classes..." is default constructible.
     * @param run(): Run tests.
@@ -41,7 +41,7 @@ namespace fbtt {
       bool finished = false;
 
       template <typename ... Cls>
-      friend void add_default_constructor_to_multitest(MultiTest<Cls...> &);
+      friend void addDefaultConstructorToMultitest(MultiTest<Cls...>& mt);
 
       template <typename ... Cls>
       friend std::ostream & operator << (std::ostream & os, const MultiTest<Cls...> & multiTest);
@@ -81,7 +81,7 @@ namespace fbtt {
       /** Add constructor to test. A default constructor is added if possible, but is removed, if a constructor is added by user. 
        * @param name: Name of constructor
        * @param constructor: Pointer to storable function with signature void(Classes * & ...) (std::function, function pointer, lambda, non-static member-function...) */
-      void add_constructor(const std::string & name, std::function<void(Classes * & ...)> && constructor)
+      void addConstructor(const std::string & name, std::function<void(Classes * & ...)> && constructor)
       {
          m_constructors.push_back(
             static_cast<std::function<void(Classes * &...)>> (constructor));
@@ -92,7 +92,7 @@ namespace fbtt {
        * @param E: Type of error to expect from the test
        * @param func: Pointer to storable function with signature void(Classes &...) (std::function, function pointer, lambda, non-static member-functio...) */
       template <ErrorType E = NoError>
-      void add_test(const std::string & testName, std::function<void(Classes &...)> func)
+      void addTest(const std::string & testName, std::function<void(Classes &...)> func)
       {  
          AbstractTest<Classes &...> * t = new Test<E, Classes & ...>(testName, func);
          m_tests.push_back(t);
@@ -103,7 +103,7 @@ namespace fbtt {
       {
          if (m_constructors.size() == 0) {
             if (VariadicDefaultInitializable<Classes...>)
-               add_default_constructor_to_multitest(*this);
+                addDefaultConstructorToMultitest(*this);
             else
                throw NoConstructor();
          }
@@ -132,16 +132,16 @@ namespace fbtt {
          finished = true;
       }
 
-       const std::vector<TestResult>& get_results()
+       const std::vector<TestResult>& getResults()
        {
            return m_testResults;
        }
    };
 
-   int get_error_code(const std::vector<TestResult>& results)
+   int getErrorCode(const std::vector<TestResult>& results)
    {
        for (unsigned i = 0; i < results.size(); ++i) {
-           if (results[i].test_failed()) {
+           if (results[i].testFailed()) {
                return i + 1;
            }
        }
@@ -151,17 +151,17 @@ namespace fbtt {
    // for multi tests, where every class is default initializable
    template <typename ... Cls>
       requires VariadicDefaultInitializable<Cls...>
-   void add_default_constructor_to_multitest(MultiTest<Cls...> & mt)
+   void addDefaultConstructorToMultitest(MultiTest<Cls...> & mt)
    {
-      mt.add_constructor("Default constructor", [](Cls * & ... instances) {
-         ((instances = new Cls { }), ...);
-      });
+       mt.addConstructor("Default constructor", [](Cls*& ... instances) {
+           ((instances = new Cls { }), ...);
+       });
    }
 
    // for multi tests, where not every class is default initializable
    template <typename ... Cls>
       requires (!VariadicDefaultInitializable<Cls...>)
-   void add_default_constructor_to_multitest(MultiTest<Cls...> & mt)
+   void addDefaultConstructorToMultitest(MultiTest<Cls...> & mt)
    { }
 
    template <typename ... Classes>
@@ -190,7 +190,7 @@ namespace fbtt {
             os << TerminalColor::WHITE << TerminalStyle::NONE
                << "   TEST " 
                << std::setw(2) << testi + 1 << " "
-               << (res.test_failed() ? 
+               << (res.testFailed() ?
                      TerminalColor::RED :
                      TerminalColor::GREEN)
                << res.status()
@@ -199,7 +199,7 @@ namespace fbtt {
                << TerminalColor::BLUE << TerminalStyle::BOLD
                << "\"" << res.testName << "\"";
 
-            if (res.test_failed()) {
+            if (res.testFailed()) {
                os << TerminalColor::WHITE << TerminalStyle::NONE 
                   << "\n      Reason: "
                   << TerminalColor::YELLOW << TerminalStyle::BOLD

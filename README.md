@@ -8,7 +8,7 @@ The function must have the signature `void()`.
 
 ```C++
 Test factorialTest { "Factorial of 5 is equal to 120", []() {
-   assert_equals(factorial(5), 120);
+   assertEquals(factorial(5), 120);
 }};
 ```
 
@@ -37,31 +37,31 @@ If the function had failed, if `factorial(5)` had been evaluated to `121`, the t
 The different types of available assertions are:
 #### Assert true
 ```C++ 
-assert_true(bool assertion, const std::string & onFail = "");
+assertTrue(bool assertion, const std::string & onFail = "");
 ```
 - Assert that `assertion` is true
    - `onFail`: String to error, if assertion fails. Defaults to "".
 
 ##### Example usage
 ```C++
-assert_true(ball.isBouncy, "Ball is not bouncy");
+assertTrue(ball.isBouncy, "Ball is not bouncy");
 ```
 
 #### Assert false
 ```C++ 
-assert_false(bool assertion, const std::string & onFail = "");
+assertFalse(bool assertion, const std::string & onFail = "");
 ```
 - Assert that `assertion` is false
    - `onFail`: String to error, if assertion fails. Defaults to "".
 
 ##### Example usage
 ```C++
-assert_false(dog.isBarking(), "Dog is barking");
+assertFalse(dog.isBarking(), "Dog is barking");
 ```
 
 #### Assert equals
 ```C++ 
-assert_equals(T x, T y, const std::string & onFail = "");
+assertEquals(T x, T y, const std::string & onFail = "");
 ```
 - Assert that value `x` and `y` of equality-comparaple types `T` and `U` are equal
    - `onFail`: String to error, if assertion fails. Defaults to "".
@@ -69,11 +69,11 @@ assert_equals(T x, T y, const std::string & onFail = "");
 ##### Example usage
 ```C++
 // assert factorial(5) == 120
-assert_equals(factorial(5), 120, "Factorial 5 is not equal to 120");
+assertEquals(factorial(5), 120, "Factorial 5 is not equal to 120");
 ```
 #### Assert equals
 ```C++ 
-assert_noteq(T x, U y, const std::string & onFail = "");
+assertNoteq(T x, U y, const std::string & onFail = "");
 ```
 - Assert that value `x` and `y` of equality-comparaple types `T` and `U` are not equal
    - `onFail`: String to error, if assertion fails. Defaults to "".
@@ -81,18 +81,18 @@ assert_noteq(T x, U y, const std::string & onFail = "");
 ##### Example usage
 ```C++
 // assert 7.0 != 3.0
-assert_noteq(7.0, 3.0, "Maths is broken: 7.0 is equal to 3.0");
+assertNoteq(7.0, 3.0, "Maths is broken: 7.0 is equal to 3.0");
 ```
 #### Assert throws
 ```C++ 
-assert_throws<ErrorType>(Function f, Args ... args);
+assertThrows<ErrorType>(Function f, Args ... args);
 ```
 - Assert, that `f` throws an instance of `ErrorType`, when invoked with `(args...)`
 
 ##### Example usage
 ```C++
 // assert, that factorial throws instance of FactorialError, when factorial(-1) is called.
-assert_throws<FactorialError>(factorial, -1);
+assertThrows<FactorialError>(factorial, -1);
 ```
 
 ## Test of Class: std::vector
@@ -110,11 +110,11 @@ MultiTest<std::vector<int>> emptyVectorTest;
 A simple test can be added. For instance, a vectors `::resize()` and `::size()` methods can be tested.
 
 ```C++
-emptyVectorTest.add_test(
+emptyVectorTest.addTest(
    "When resized to x, has size x", [](std::vector<int> & vector)
    {
       vector.resize(20);
-      assert_equals(vector.size(), 20);
+      assertEquals(vector.size(), 20);
    }
 )
 ```
@@ -122,7 +122,7 @@ As you can see, the lambda function is passed an instance of `std::vector<int>` 
 
 Another function may be created. This function could be a test of an error, thrown by `std::vector<int>`. If you want to test for an error, you can add an expected error to the test as a template parameter:
 ```C++
-emptyVectorTest.add_test<std::out_of_range>(
+emptyVectorTest.addTest<std::out_of_range>(
    "When referencing element -1 with ::at(), throws out of range", 
    [](auto & vec) {
       vec.at(-1);
@@ -130,9 +130,9 @@ emptyVectorTest.add_test<std::out_of_range>(
 );
 ```
 
-Because `std::vector<int>` has a default constructor, an instance is constructed by default before every test. If this is not possible, (if you have a class, which has no default constructer) a constructor can be added with `MultiTest::add_constructor()`
+Because `std::vector<int>` has a default constructor, an instance is constructed by default before every test. If this is not possible, (if you have a class, which has no default constructer) a constructor can be added with `MultiTest::addConstructor()`
 ```C++
-emptyVectorTest.add_constructor(
+emptyVectorTest.addConstructor(
    "initializing with 0", [](std::vector<int> * & vec)
    {
       vec = new std::vector<int>(0);
@@ -141,7 +141,7 @@ emptyVectorTest.add_constructor(
 ```
 If this is defined, the tests will begin with this constructor, instead of the predefined constructor. Any number of constructors can be added to the `MultiTest`.
 
-Constructors added with `add_constructor` must allocate to free store with `new`.
+Constructors added with `addConstructor` must allocate to free store with `new`.
 
 ### Flow of testing
 When `MultiClass::run()` is called, the following happens (assume 2 constructors, 3 tests):
@@ -174,12 +174,12 @@ std::cout << multiTest;
 This multitest can be found in `"examples/vectorTest.cpp"`.
 
 
-#### Comment about `add_constructor`
-The `MultiTest::add_constructor`-method takes a function pointer as its second argument. This function pointer has the signature `void(Classes * & ...)`.
+#### Comment about `addConstructor`
+The `MultiTest::addConstructor`-method takes a function pointer as its second argument. This function pointer has the signature `void(Classes * & ...)`.
 This would, for a test with `std::vector<int>` mean, that the signature is `void(std::vector<int> * &)`. This has been done, so simple construction functions would remain simple, e.g.:
 
 ```C++
-test.add_constructor(
+test.addConstructor(
    "Simple constructor for T", [](T * & t) {
       t = new T { x, y, z };
    }

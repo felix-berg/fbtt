@@ -11,7 +11,7 @@ namespace fbtt {
    /** Container for result of a test. Gotten with Test::Result
     * @param testName: Name of test
     * @param failString: Error message for test
-    * @param test_failed(): True, if test failed, false otherwise
+    * @param testFailed(): True, if test failed, false otherwise
     * @param status(): String indicating the status of the test
     * @param report(): Combined information about the testresult
    */
@@ -29,7 +29,7 @@ namespace fbtt {
       const Status statusCode; // status code for test 
       const std::string failString = ""; // reason for potential test failure
 
-      bool test_failed() const; 
+      bool testFailed() const;
       std::string status() const;
       std::string report() const;
    };
@@ -139,7 +139,7 @@ namespace fbtt {
    }
 
    /** @returns True, if test failed, false otherwise */
-bool TestResult::test_failed() const
+bool TestResult::testFailed() const
 {
    return !(statusCode == PASSED ||
             statusCode == NOT_RUN);
@@ -168,17 +168,17 @@ std::string TestResult::status() const
    /** @returns Formatted report of test run. */
    std::string TestResult::report() const
    {
-      return "TEST \"" + testName + "\" " + (test_failed() ? "✕" : "✓") + " " + status() + ". " + (test_failed() ? "Reason: " + failString : "");
+      return "TEST \"" + testName + "\" " + (testFailed() ? "✕" : "✓") + " " + status() + ". " + (testFailed() ? "Reason: " + failString : "");
    }
 
    std::ostream & operator << (std::ostream & os, const TestResult & res)
    {
       os <<  "TEST " << TerminalStyle::BOLD
          << TerminalColor::BRIGHT_BLUE << res.testName << ' '
-         << (res.test_failed() ? TerminalColor::RED : TerminalColor::GREEN)
+         << (res.testFailed() ? TerminalColor::RED : TerminalColor::GREEN)
          << res.status();
 
-      if (res.test_failed()) {
+      if (res.testFailed()) {
          os << TerminalStyle::NONE << TerminalColor::WHITE
             << "\n      Reason: "
             << TerminalColor::YELLOW

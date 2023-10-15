@@ -24,7 +24,7 @@ namespace fbtt {
    TerminalStyle g_terminalStyle = TerminalStyle::NONE; // don't change
    TerminalColor g_terminalColor = TerminalColor::WHITE; // don't change
 
-   void update_ostream_color_and_style(std::ostream & os)
+   void updateOstreamColorAndStyle(std::ostream & os)
    {
       // unix escape code \033
       os << "\033[" << static_cast<int>(g_terminalStyle) 
@@ -36,7 +36,7 @@ namespace fbtt {
    {
    #ifdef __unix__
       g_terminalColor = color;
-      update_ostream_color_and_style(os);
+       updateOstreamColorAndStyle(os);
    #endif
       return os;
    };
@@ -45,7 +45,7 @@ namespace fbtt {
    {
    #ifdef __unix__
       g_terminalStyle = style;
-      update_ostream_color_and_style(os);
+       updateOstreamColorAndStyle(os);
    #endif
       return os;
 }
