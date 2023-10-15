@@ -76,8 +76,16 @@ int main()
       }
    );
 
+   emptyVectorTest.add_test(
+       "failing test", [](auto& vec) {
+            assert_false(true);
+       }
+   );
+
    std::cout << "Running tests...\n";
    emptyVectorTest.run();
 
    std::cout << emptyVectorTest;
+
+   return get_error_code(emptyVectorTest.get_results());
 }

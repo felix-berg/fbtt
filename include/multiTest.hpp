@@ -131,7 +131,22 @@ namespace fbtt {
          }
          finished = true;
       }
+
+       const std::vector<TestResult>& get_results()
+       {
+           return m_testResults;
+       }
    };
+
+   int get_error_code(const std::vector<TestResult>& results)
+   {
+       for (unsigned i = 0; i < results.size(); ++i) {
+           if (results[i].test_failed()) {
+               return i + 1;
+           }
+       }
+       return 0;
+   }
 
    // for multi tests, where every class is default initializable
    template <typename ... Cls>
@@ -174,7 +189,7 @@ namespace fbtt {
 
             os << TerminalColor::WHITE << TerminalStyle::NONE
                << "   TEST " 
-               << std::setw(2) << testi << " "
+               << std::setw(2) << testi + 1 << " "
                << (res.test_failed() ? 
                      TerminalColor::RED :
                      TerminalColor::GREEN)
