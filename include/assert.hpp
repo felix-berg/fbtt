@@ -47,7 +47,7 @@ namespace fbtt {
     * @throws Throws AssertionFailure if x is not within the margin of y. */
    template <typename T, typename U>
       requires (std::three_way_comparable<T> && std::convertible_to<T, U>)
-   void assertApprox(const T & x, const U & y, const std::string & onFail = "", float margin = 0.0001f)
+   void assertApprox(const T & x, const U & y, const std::string & onFail = "", T margin = 0.0001f)
    {
       if (x < T(y) - margin || T(y) + margin < x) 
          throw EqualityAssertionFailure(x, T(y), onFail);
